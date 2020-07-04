@@ -38,7 +38,7 @@ dependencies {
 
 
 
-## Sample Code
+## Sample Usage
 ````
             AudioInput input1 = new GeneralAudioInput(input1Path);
             input1.setStartTimeUs(startTimeUs); //Optional
