@@ -1,0 +1,3 @@
+include ':audio_mixer'
+include ':app'
+rootProject.name = "Audio Mixer"
