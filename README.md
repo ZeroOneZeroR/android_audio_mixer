@@ -63,6 +63,10 @@ dependencies {
             audioMixer.setSampleRate(44100); // Optional
             audioMixer.setBitRate(128000); // Optional
             audioMixer.setChannelCount(2); // Optional //1(mono) or 2(stereo)
+	    
+	    // Smaller audio inputs will be encoded from start-time again if it reaches end-time
+            // It is only valid for parallel mixing
+            //audioMixer.setLoopingEnabled(true);
 
             audioMixer.setMixingType(AudioMixer.MixingType.SEQUENTIAL); // or AudioMixer.MixingType.PARALLEL
             audioMixer.setProcessingListener(new AudioMixer.ProcessingListener() {
