@@ -96,17 +96,23 @@ public class MainActivity extends AppCompatActivity {
         try{
             audioMixer = new AudioMixer(outputPath);
 
+            int i = 0;
             for(Input input: inputs){
                 AudioInput audioInput;
                 if(input.uri != null){
-                    audioInput = new GeneralAudioInput(activity, input.uri, null);
-                    //audioInput.setEndTimeUs(input.startTimeUs); // optional
-                    //audioInput.setEndTimeUs(input.endTimeUs); // optional
-                    //audioInput.setVolume(0.5f); //optional
+                    GeneralAudioInput ai = new GeneralAudioInput(activity, input.uri, null);
+                    //ai.setEndTimeUs(input.startTimeUs); // optional
+                    //ai.setEndTimeUs(input.endTimeUs); // optional
+                    //ai.setVolume(0.5f); //optional
+                    if( i > 0){
+                        ai.setStartOffsetUs(2000000); //We can set a start offset time
+                    }
+                    audioInput = ai;
                 }else{
                     audioInput = new BlankAudioInput(5000000);
                 }
                 audioMixer.addDataSource(audioInput);
+                i++;
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -114,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         //audioMixer.setSampleRate(44100);  // optional
         //audioMixer.setBitRate(128000); // optional
         //audioMixer.setChannelCount(2); // 1 or 2 // optional
-        audioMixer.setLoopingEnabled(true); // Only works for parallel mixing
+        //audioMixer.setLoopingEnabled(true); // Only works for parallel mixing
         audioMixer.setMixingType(AudioMixer.MixingType.PARALLEL);
         audioMixer.setProcessingListener(new AudioMixer.ProcessingListener() {
             @Override

@@ -12,12 +12,17 @@ import java.nio.ShortBuffer;
 import java.util.Map;
 
 import zeroonezero.android.audio_mixer.AudioBufferConverter;
+import zeroonezero.android.audio_mixer.AudioConversions;
 import zeroonezero.android.audio_mixer.AudioDecoder;
 
 public class GeneralAudioInput extends AudioInput {
 
     private final AudioDecoder decoder;
     private AudioBufferConverter audioBufferConverter;
+
+    private long startOffsetUs;
+    private int requiredShortsForStartOffset;
+    private int startOffsetShortsCounter;
 
     private int outputSampleRate;
     private int outputChannelCount;
@@ -64,14 +69,16 @@ public class GeneralAudioInput extends AudioInput {
 
     private void init(){
         audioBufferConverter = new AudioBufferConverter();
-        outputSampleRate = decoder.getSampleRate();
-        outputChannelCount = decoder.getChannelCount();
     }
 
     @Override
     public void setLoopingEnabled(boolean loopingEnabled) {
         super.setLoopingEnabled(loopingEnabled);
         decoder.setLoopingEnabled(loopingEnabled);
+    }
+
+    public long getStartOffsetUs() {
+        return startOffsetUs;
     }
 
     @Override
@@ -86,7 +93,7 @@ public class GeneralAudioInput extends AudioInput {
 
     @Override
     public long getDurationUs() {
-        return getEndTimeUs() - getStartTimeUs();
+        return getEndTimeUs() - getStartTimeUs() + getStartOffsetUs();
     }
 
     @Override
@@ -102,6 +109,10 @@ public class GeneralAudioInput extends AudioInput {
     @Override
     public int getChannelCount() {
         return decoder.getChannelCount();
+    }
+
+    public void setStartOffsetUs(long startOffsetUs) {
+        this.startOffsetUs = startOffsetUs<0 ? 0 : startOffsetUs;
     }
 
     @Override
@@ -125,11 +136,19 @@ public class GeneralAudioInput extends AudioInput {
         this.outputChannelCount = outputChannelCount;
         hasRemaining = true;
         decoder.start();
+
+        requiredShortsForStartOffset = AudioConversions.usToShorts(getStartOffsetUs(), this.outputSampleRate, this.outputChannelCount);
+        startOffsetShortsCounter = 0;
     }
 
     @Override
     public short getNext() {
         if(!hasRemaining()) throw new RuntimeException("Audio input has no remaining value.");
+
+        if(startOffsetShortsCounter < requiredShortsForStartOffset){
+            startOffsetShortsCounter++;
+            return 0;
+        }
 
         decode();
         short value = 0;
