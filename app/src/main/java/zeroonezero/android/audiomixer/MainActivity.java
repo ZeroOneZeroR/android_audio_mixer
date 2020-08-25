@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -30,12 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 0;
     private static final int AUDIO_CHOOSE_REQUEST_CODE = 1;
-
-    private class Input{
-        Uri uri;
-        long startTimeUs;
-        long endTimeUs;
-    }
 
     private Activity activity;
 
@@ -96,23 +91,20 @@ public class MainActivity extends AppCompatActivity {
         try{
             audioMixer = new AudioMixer(outputPath);
 
-            int i = 0;
             for(Input input: inputs){
                 AudioInput audioInput;
                 if(input.uri != null){
                     GeneralAudioInput ai = new GeneralAudioInput(activity, input.uri, null);
-                    //ai.setEndTimeUs(input.startTimeUs); // optional
-                    //ai.setEndTimeUs(input.endTimeUs); // optional
+                    ai.setStartOffsetUs(input.startOffsetUs);
+                    ai.setStartTimeUs(input.startTimeUs); // optional
+                    ai.setEndTimeUs(input.endTimeUs); // optional
                     //ai.setVolume(0.5f); //optional
-                    if( i > 0){
-                        ai.setStartOffsetUs(2000000); //We can set a start offset time
-                    }
+
                     audioInput = ai;
                 }else{
                     audioInput = new BlankAudioInput(5000000);
                 }
                 audioMixer.addDataSource(audioInput);
-                i++;
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -176,31 +168,24 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == AUDIO_CHOOSE_REQUEST_CODE && resultCode == RESULT_OK){
             try{
-                long startTimeUs = 0;
-                long endTimeUs = 0;
-
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                 retriever.setDataSource(activity, data.getData());
                 String dur = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                if(dur != null){
-                    long duration = Integer.parseInt(dur); // milli second
-                    endTimeUs = duration * 1000; // micro second
-                    if(endTimeUs > 15000000) endTimeUs = 15000000;
-                }
+                long duration = Integer.parseInt(dur) * 1000; // milli to micro second
                 retriever.release();
 
                 Input input = new Input();
                 input.uri = data.getData();
-                /*input.startTimeUs = startTimeUs;
-                input.endTimeUs = endTimeUs;*/
-
+                input.durationUs = duration;
                 inputs.add(input);
-                //inputs.add(new Input()); // Just to give example of blank audio input
-
                 Toast.makeText(activity, inputs.size()+" input(s) added.", Toast.LENGTH_SHORT).show();
 
-            }catch (Exception o){
+                AudioInputSettingsDialog dialog = new AudioInputSettingsDialog(activity, input);
+                dialog.setCancelable(false);
+                dialog.show();
 
+            }catch (Exception o){
+                Toast.makeText(activity, "Input not added.", Toast.LENGTH_SHORT).show();
             }
         }
     }
