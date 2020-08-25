@@ -6,6 +6,7 @@ made with android native media APIs (MediaCodec, MediaFormat, MediaMuxer) and JA
 ## Features
 - Mixing multple audios parallely or sequentially or processing single audio
 - Trimming audio
+- Adding an audio to another audio at specific time
 - Changing sample-rate, bit-rate, channel(mono to stereo and vice versa) of audio
 - Controlling volume of audio
 - Making an audio file without any real audio data
@@ -32,7 +33,7 @@ allprojects {
 Step 2. Add the dependency
 ````
 dependencies {
-	        implementation 'com.github.rajib010:android_audio_mixer:v1.0'
+	        implementation 'com.github.rajib010:android_audio_mixer:v1.1'
 	}
 ````
 
@@ -41,14 +42,16 @@ dependencies {
 ## Sample Usage
 ````
             AudioInput input1 = new GeneralAudioInput(input1Path);
-            input1.setStartTimeUs(startTimeUs); //Optional
-            input1.setEndTimeUs(endTimeUs); //Optional
             input1.setVolume(0.5f); //Optional
 
-            // It will produce a blank portion of 3 seconds between input1 and input2
-            AudioInput blankInput = new BlankAudioInput(3000000);
+            // It will produce a blank portion of 3 seconds between input1 and input2 if mixing type is sequential.
+	    // But it will does nothing in parallel mixing.
+            AudioInput blankInput = new BlankAudioInput(3000000); //
 
             AudioInput input2 = new GeneralAudioInput(context, input2Uri, null);
+	    input2.setStartTimeUs(3000000); //Optional
+            input2.setEndTimeUs(9000000); //Optional
+	    input2.setStartOffsetUs(5000000); //Optional. It is needed to start mixing the input at a certain time.
 
 
 
@@ -68,7 +71,7 @@ dependencies {
             // It is only valid for parallel mixing
             //audioMixer.setLoopingEnabled(true);
 
-            audioMixer.setMixingType(AudioMixer.MixingType.SEQUENTIAL); // or AudioMixer.MixingType.PARALLEL
+            audioMixer.setMixingType(AudioMixer.MixingType.PARALLEL); // or AudioMixer.MixingType.SEQUENTIAL
             audioMixer.setProcessingListener(new AudioMixer.ProcessingListener() {
                 @Override
                 public void onProgress(final double progress) {
