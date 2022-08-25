@@ -53,6 +53,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.add_video_audio_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openVideoChooser();
+            }
+        });
+
         findViewById(R.id.mix_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e){
             e.printStackTrace();
         }
-        //audioMixer.setSampleRate(44100);  // optional
+        audioMixer.setSampleRate(48000);  // optional
         //audioMixer.setBitRate(128000); // optional
         //audioMixer.setChannelCount(2); // 1 or 2 // optional
         //audioMixer.setLoopingEnabled(true); // Only works for parallel mixing
@@ -163,6 +170,14 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, AUDIO_CHOOSE_REQUEST_CODE);
     }
 
+    public void openVideoChooser(){
+        Intent intent = new Intent();
+        intent.setType("video/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivityForResult(intent, AUDIO_CHOOSE_REQUEST_CODE);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -207,9 +222,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE:
-                if (    grantResults.length > 1
+                if (grantResults.length > 1
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 

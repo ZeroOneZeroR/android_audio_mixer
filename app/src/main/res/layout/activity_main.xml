@@ -12,6 +12,12 @@
         android:layout_centerInParent="true">
 
         <Button
+            android:id="@+id/add_video_audio_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add video audio"/>
+
+        <Button
             android:id="@+id/add_audio_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
