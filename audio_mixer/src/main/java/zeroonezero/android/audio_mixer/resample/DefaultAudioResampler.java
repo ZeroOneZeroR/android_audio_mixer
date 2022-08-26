@@ -12,11 +12,9 @@ public class DefaultAudioResampler implements AudioResampler {
 
     @Override
     public void resample(@NonNull ShortBuffer inputBuffer, int inputSampleRate, @NonNull ShortBuffer outputBuffer, int outputSampleRate, int channels) {
-        if (inputSampleRate < outputSampleRate) {
-            UPSAMPLE.resample(inputBuffer, inputSampleRate, outputBuffer, outputSampleRate, channels);
-        } else if (inputSampleRate > outputSampleRate) {
-            DOWNSAMPLE.resample(inputBuffer, inputSampleRate, outputBuffer, outputSampleRate, channels);
-        } else {
+        if (inputSampleRate != outputSampleRate) {
+            DIFFSAMPLE.resample(inputBuffer, inputSampleRate, outputBuffer, outputSampleRate, channels);
+        }else {
             PASSTHROUGH.resample(inputBuffer, inputSampleRate, outputBuffer, outputSampleRate, channels);
         }
     }

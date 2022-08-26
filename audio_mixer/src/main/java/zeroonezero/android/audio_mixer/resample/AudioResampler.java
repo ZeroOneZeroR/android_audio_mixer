@@ -5,8 +5,8 @@ import androidx.annotation.NonNull;
 import java.nio.ShortBuffer;
 
 /**
- * Resamples audio data. See {@link UpsampleAudioResampler} or
- * {@link DownsampleAudioResampler} for concrete implementations.
+ * Resamples audio data. See {@link DifferentSampleRateResampler} or
+ * {@link PassThroughAudioResampler} for concrete implementations.
  */
 public interface AudioResampler {
 
@@ -21,9 +21,7 @@ public interface AudioResampler {
      */
     void resample(@NonNull final ShortBuffer inputBuffer, int inputSampleRate, @NonNull final ShortBuffer outputBuffer, int outputSampleRate, int channels);
 
-    AudioResampler DOWNSAMPLE = new DownsampleAudioResampler();
-
-    AudioResampler UPSAMPLE = new UpsampleAudioResampler();
+    AudioResampler DIFFSAMPLE = new DifferentSampleRateResampler();
 
     AudioResampler PASSTHROUGH = new PassThroughAudioResampler();
 }

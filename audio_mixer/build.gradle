@@ -12,6 +12,12 @@ android {
         versionName "1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+                arguments "-DRESAMPLER_OUTER_NAMESPACE=zeroonezero.android.audio_mixer -Wc++17-extensions"
+            }
+        }
     }
 
     buildTypes {
@@ -28,7 +34,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version '3.18.1'
+        }
+    }
     publishing {
         singleVariant('release') {
         }
@@ -55,11 +66,11 @@ apply from: '../maven-publish-helper.gradle'
 publishing {
     publications {
         release(MavenPublication) {
-            groupId 'zeroonezero.android_audio_mixer'
+            groupId 'zeroonezero.android.audio_mixer'
             artifactId = 'android_audio_mixer'
         }
         debug(MavenPublication) {
-            groupId 'zeroonezero.android_audio_mixer'
+            groupId 'zeroonezero.android.audio_mixer'
             artifactId = 'android_audio_mixer-debug'
         }
     }
