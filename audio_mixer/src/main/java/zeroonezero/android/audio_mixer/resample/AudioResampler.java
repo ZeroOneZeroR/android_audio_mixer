@@ -21,7 +21,5 @@ public interface AudioResampler {
      */
     void resample(@NonNull final ShortBuffer inputBuffer, int inputSampleRate, @NonNull final ShortBuffer outputBuffer, int outputSampleRate, int channels);
 
-    AudioResampler DIFFSAMPLE = new DifferentSampleRateResampler();
-
     AudioResampler PASSTHROUGH = new PassThroughAudioResampler();
 }
