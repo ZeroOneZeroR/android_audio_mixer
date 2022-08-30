@@ -9,7 +9,9 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +56,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.add_video_audio_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openVideoChooser();
+            }
+        });
+
         findViewById(R.id.mix_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,6 +83,19 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     Toast.makeText(activity, "No audio added.", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        findViewById(R.id.play_btn).setOnClickListener(v -> {
+            File file=new File(outputPath);
+            MediaPlayer mediaPlayer = new MediaPlayer();
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            try {
+                mediaPlayer.setDataSource(getApplicationContext(), Uri.fromFile(file));
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
 
@@ -109,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e){
             e.printStackTrace();
         }
-        //audioMixer.setSampleRate(44100);  // optional
+        audioMixer.setSampleRate(48000);  // optional
         //audioMixer.setBitRate(128000); // optional
         //audioMixer.setChannelCount(2); // 1 or 2 // optional
         //audioMixer.setLoopingEnabled(true); // Only works for parallel mixing
@@ -163,6 +186,14 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, AUDIO_CHOOSE_REQUEST_CODE);
     }
 
+    public void openVideoChooser(){
+        Intent intent = new Intent();
+        intent.setType("video/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivityForResult(intent, AUDIO_CHOOSE_REQUEST_CODE);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -207,9 +238,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE:
-                if (    grantResults.length > 1
+                if (grantResults.length > 1
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 

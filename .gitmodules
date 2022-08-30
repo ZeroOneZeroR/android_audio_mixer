@@ -1,0 +1,3 @@
+[submodule "audio_mixer/src/main/cpp/oboe"]
+	path = audio_mixer/src/main/cpp/oboe
+	url = https://github.com/google/oboe
